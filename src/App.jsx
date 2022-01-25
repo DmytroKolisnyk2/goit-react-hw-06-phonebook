@@ -1,5 +1,8 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import { info } from "@pnotify/core";
+
+import { addContact, deleteContact } from "./redux/store";
 
 import ContactForm from "./components/ContactForm/ContactForm";
 import ContactList from "./components/ContactList/ContactList";
@@ -11,44 +14,28 @@ import "@pnotify/core/dist/PNotify.css";
 import "@pnotify/core/dist/BrightTheme.css";
 
 class App extends Component {
-  state = {
-    contacts: [],
-    filter: "",
-  };
-
   componentDidMount() {
     const parsedContacts = JSON.parse(localStorage.getItem("contacts"));
     parsedContacts && this.setState({ contacts: parsedContacts });
   }
   componentDidUpdate(prevProps, prevState) {
-    this.state.contacts !== prevState.contacts &&
-      localStorage.setItem("contacts", JSON.stringify(this.state.contacts));
+    this.props.contacts !== prevProps.contacts &&
+      localStorage.setItem("contacts", JSON.stringify(this.props.contacts));
   }
   deleteContact = (id) => {
-    this.setState((prevState) => ({
-      contacts: prevState.contacts.filter((element) => element.id !== id),
-    }));
+    this.props.deleteContact(id);
+    console.log(this.props.contacts);
   };
 
   addContact = (contactData) => {
-    this.setState((prevState) => ({
-      contacts: [contactData, ...prevState.contacts],
-    }));
+    this.props.addContact(contactData);
     info({ text: `Contact successfully added`, delay: 700 });
+    console.log(contactData);
   };
 
-  filterOnChange = ({ target }) => {
-    this.setState({ filter: target.value });
-  };
+  filterOnChange = ({ target }) => this.props.filterOnChange(target.value);
 
   render() {
- const { filter, contacts } = this.state;
-
-    const query = filter.toLocaleLowerCase();
-    const visibleContacts = contacts.filter((element) =>
-      element.name.toLocaleLowerCase().includes(query)
-    );
-
     return (
       <>
         <div className="phonebook__wrapper">
@@ -56,21 +43,38 @@ class App extends Component {
             <h1 className="headline">Phonebook</h1>
 
             <h2>Add new contact</h2>
-            <ContactForm onSubmitHandler={this.addContact} contacts={contacts} />
+            <ContactForm onSubmitHandler={this.addContact} contacts={this.props.contacts} />
           </div>
           <div className="list-wrapper">
             <h2>Contacts</h2>
-            <Filter value={filter} onChange={this.filterOnChange} />
+            <Filter />
 
-            {/* Додаткова опція)) */}
-            {filter && <Message />}
+            {this.props.filter && <Message />}
 
-            <ContactList deleteContact={this.deleteContact} contacts={visibleContacts} />
+            <ContactList
+              deleteContact={this.deleteContact}
+              contacts={this.props.filteredContacts}
+            />
           </div>
         </div>
       </>
     );
   }
 }
+const filterContacts = (query, contacts) =>
+  contacts.filter((element) =>
+    element.name.toLocaleLowerCase().includes(query.toLocaleLowerCase())
+  );
 
-export default App;
+const mapStateToProps = ({ contacts, filter }) => ({
+  filteredContacts: filterContacts(filter, contacts),
+  contacts: contacts,
+  filter:filter
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  addContact: (contact) => dispatch(addContact(contact)),
+  deleteContact: (contact) => dispatch(deleteContact(contact)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
