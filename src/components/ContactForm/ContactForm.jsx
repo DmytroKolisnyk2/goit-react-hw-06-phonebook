@@ -6,6 +6,7 @@ import "@pnotify/core/dist/BrightTheme.css";
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
+import { addContact } from "../../redux/contacts/items/items-actions";
 
 const INITIAL_STATE = {
   name: "",
@@ -26,13 +27,17 @@ class ContactForm extends Component {
     const { name, value } = target;
     this.setState({ [name]: value });
   };
+  addContact = (contactData) => {
+    this.props.addContact(contactData);
+    info({ text: `Contact successfully added`, delay: 700 });
+  };
 
   onSubmitHandler = (event) => {
     event.preventDefault();
     const { contacts } = this.props;
     if (!contacts.find((item) => item.name === this.state.name)) {
       const contactData = { name: this.state.name, number: this.state.number, id: nanoid() };
-      this.props.onSubmitHandler(contactData);
+      this.addContact(contactData);
       this.reset();
     } else {
       info({ text: `${this.state.name} is already in contacts.`, delay: 700 });
@@ -81,9 +86,13 @@ const mapStateToProps = ({ contacts }) => ({
   contacts: contacts.items,
 });
 
-export default connect(mapStateToProps, null)(ContactForm);
+const mapDispatchToProps = (dispatch) => ({
+  addContact: (contact) => dispatch(addContact(contact)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(ContactForm);
 
 ContactForm.propTypes = {
   contacts: PropTypes.array.isRequired,
-  onSubmitHandler: PropTypes.func.isRequired,
+  addContact: PropTypes.func.isRequired,
 };

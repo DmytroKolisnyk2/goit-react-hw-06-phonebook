@@ -3,7 +3,7 @@ import { nanoid } from "nanoid";
 import "./Filter.scss";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { changeFilter } from "../../redux/contacts/filter/filter-actions";
+import { changeFilter } from "../../redux/contacts/contacts/filter/filter-actions";
 
 const filterId = nanoid();
 
