@@ -5,6 +5,7 @@ import "@pnotify/core/dist/PNotify.css";
 import "@pnotify/core/dist/BrightTheme.css";
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import { connect } from "react-redux";
 
 const INITIAL_STATE = {
   name: "",
@@ -76,8 +77,11 @@ class ContactForm extends Component {
     );
   }
 }
+const mapStateToProps = ({ contacts }) => ({
+  contacts: contacts.items,
+});
 
-export default ContactForm;
+export default connect(mapStateToProps, null)(ContactForm);
 
 ContactForm.propTypes = {
   contacts: PropTypes.array.isRequired,

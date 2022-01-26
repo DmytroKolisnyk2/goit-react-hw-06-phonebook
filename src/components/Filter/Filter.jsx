@@ -3,7 +3,7 @@ import { nanoid } from "nanoid";
 import "./Filter.scss";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { changeFilter } from "../../redux/store";
+import { changeFilter } from "../../redux/contacts/filter/filter-actions";
 
 const filterId = nanoid();
 
@@ -30,12 +30,12 @@ Filter.propTypes = {
   value: PropTypes.string.isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  value: state.filter,
+const mapStateToProps = ({ contacts }) => ({
+  value: contacts.filter,
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  onChange: ({ target }) => dispatch(changeFilter(target.value))
+  onChange: ({ target }) => dispatch(changeFilter(target.value)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Filter);

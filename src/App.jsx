@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { info } from "@pnotify/core";
 
-import { addContact, deleteContact } from "./redux/store";
+import { addContact, deleteContact } from "./redux/contacts/items/items-actions";
 
 import ContactForm from "./components/ContactForm/ContactForm";
 import ContactList from "./components/ContactList/ContactList";
@@ -24,13 +24,11 @@ class App extends Component {
   }
   deleteContact = (id) => {
     this.props.deleteContact(id);
-    console.log(this.props.contacts);
   };
 
   addContact = (contactData) => {
     this.props.addContact(contactData);
     info({ text: `Contact successfully added`, delay: 700 });
-    console.log(contactData);
   };
 
   filterOnChange = ({ target }) => this.props.filterOnChange(target.value);
@@ -43,7 +41,7 @@ class App extends Component {
             <h1 className="headline">Phonebook</h1>
 
             <h2>Add new contact</h2>
-            <ContactForm onSubmitHandler={this.addContact} contacts={this.props.contacts} />
+            <ContactForm onSubmitHandler={this.addContact} />
           </div>
           <div className="list-wrapper">
             <h2>Contacts</h2>
@@ -66,10 +64,10 @@ const filterContacts = (query, contacts) =>
     element.name.toLocaleLowerCase().includes(query.toLocaleLowerCase())
   );
 
-const mapStateToProps = ({ contacts, filter }) => ({
-  filteredContacts: filterContacts(filter, contacts),
-  contacts: contacts,
-  filter:filter
+const mapStateToProps = ({ contacts }) => ({
+  filteredContacts: filterContacts(contacts.filter, contacts.items),
+  contacts: contacts.items,
+  filter: contacts.filter,
 });
 
 const mapDispatchToProps = (dispatch) => ({
